@@ -16,49 +16,13 @@ jobs:
     docker:
       - image: cimg/python:3.10
     steps:
+      - checkout
       - run:
           name: Confirm builds are from the same project
-          # yes, we can run python scripts directly too!
-          shell: "/usr/bin/env python"
           command: |
-            import re
-            from typing import Tuple
-            from urllib.parse import urlparse
-
-            path_expression = "^/pipelines/(?P<vcs>github|bitbucket)/(?P<project>.+/.+)/(?P<pipeline_id>\d+)/workflows/(?P<workflow_id>[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})/jobs/(?P<job_id>\d+)"
-            pattern = re.compile(path_expression)
-
-            a = "<< pipeline.parameters.build-link-a >>"
-            b = "<< pipeline.parameters.build-link-b >>"
-            assert (a and b), "invalid build links"
-
-            url_a = urlparse(a)
-            url_b = urlparse(b)
-            assert (url_a.hostname == url_b.hostname and url_a.hostname == "app.circleci.com"), "build links are not for CircleCI Cloud"
-
-            def project_info(path: str) -> Tuple[str, str, str, str]:
-                matched = pattern.search(path)
-                assert matched, "build link is not regarding a job"
-
-                return (
-                    matched.group('vcs'),
-                    matched.group('project'),
-                    matched.group('workflow_id'),
-                    matched.group('job_id'),
-                )
-
-            info_a = project_info(url_a.path)
-            info_b = project_info(url_b.path)
-
-            comparision = zip(info_a, info_b)
-            to_compare = {
-                "vcs": next(comparision),
-                "project": next(comparision),
-            }
-
-            for attr, (a, b) in to_compare.items():
-                assert a == b, f"{attr}: {a=}, while {b=}"
-
+            python cli.py --validate \
+              << pipeline.parameters.build-link-a >> \
+              << pipeline.parameters.build-link-b >>
 
 workflows:
   diff-builds:
