@@ -49,4 +49,6 @@ workflows:
         - << pipeline.parameters.build-link-b >>
     jobs:
       - validate
-      - info
+      - info:
+          requires:
+            - validate
