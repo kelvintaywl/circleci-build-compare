@@ -45,6 +45,11 @@ def validate(links: List[BuildLink]):
     
     assert a.project == b.project, f"Different projects found: { a.project= }. {b.project= }"
 
+
+def info(link: BuildLink):
+    logging.info(link)
+
+
 def setup_logging():
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
@@ -64,6 +69,16 @@ def parse_args():
         action='store_true',
         help='Run sanity checks on URLs',
     )
+    parser.add_argument(
+        '--info',
+        action='store_true',
+        help='Extract build information from URL',
+    )
+    parser.add_argument(
+        '--index',
+        type=int,
+        help='index of build link (URL)',
+    )
     return parser.parse_args()
 
 
@@ -78,3 +93,7 @@ if __name__ == "__main__":
 
     if args.validate:
         validate(links)
+
+    if args.info and args.index:
+        link = links[args.index]
+        info(link)
