@@ -1,0 +1,17 @@
+version: 2.1
+
+jobs:
+  echo:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - run:
+          name: Greet
+          command: echo "I love ${COLOR} builds."
+          environment:
+            COLOR: "green"
+
+workflows:
+  main:
+    jobs:
+      - echo
