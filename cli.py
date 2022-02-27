@@ -77,6 +77,7 @@ def parse_args():
     parser.add_argument(
         '--index',
         type=int,
+        default=0,
         help='index of build link (URL)',
     )
     return parser.parse_args()
