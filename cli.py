@@ -95,6 +95,6 @@ if __name__ == "__main__":
     if args.validate:
         validate(links)
 
-    if args.info and args.index:
+    if args.info and args.index >= 0:
         link = links[args.index]
         info(link)
