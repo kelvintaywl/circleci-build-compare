@@ -1,5 +1,14 @@
 version: 2.1
 
+orbs:
+  python: circleci/python@2.0.1
+
+commands:
+  python-deps:
+    steps:
+      - python/install-packages:
+          pkg-manager: poetry
+
 parameters:
   build-link-a:
     type: string
@@ -17,6 +26,7 @@ jobs:
       - image: cimg/python:3.10
     steps:
       - checkout
+      - python-deps
       - run:
           name: Confirm builds are from the same project
           command: |
@@ -29,17 +39,33 @@ jobs:
         type: integer
         default: 2
     parallelism: << parameters.n >>
-    resource_class: small
+    resource_class: medium
     docker:
       - image: cimg/python:3.10
     steps:
       - checkout
+      - python-deps
       - run:
           name: Parse build information
           command: |
             python cli.py --index=$CIRCLE_NODE_INDEX --info \
               << pipeline.parameters.build-link-a >> \
               << pipeline.parameters.build-link-b >>
+      - persist_to_workspace:
+          root: .
+          paths:
+            - job_info_*.yml
+  visualize:
+    resource_class: small
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Diff
+          command: |
+            git diff --no-index job_info_0.yml job_info_1.yml
 
 workflows:
   diff-builds:
@@ -52,3 +78,6 @@ workflows:
       - info:
           requires:
             - validate
+      - visualize:
+          requires:
+            - info
