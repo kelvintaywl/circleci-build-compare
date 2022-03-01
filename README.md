@@ -24,6 +24,6 @@ flowchart LR
     support((Support Team)) -- trigger pipeline --> validate[validate: sanity check]
     validate --> infoA[info 0: parse build info for A]
     validate --> infoB[info 1: parse build info for B]
-    infoA -- attach_workspace --> output[output: visual diff]
-    infoB -- attach_workspace --> output
+    infoA -- attach_workspace --> visualize[visualize: visual diff]
+    infoB -- attach_workspace --> visualize
 ```
