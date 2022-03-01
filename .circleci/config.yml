@@ -30,7 +30,7 @@ jobs:
       - run:
           name: Confirm builds are from the same project
           command: |
-            python cli.py --validate \
+            poetry run python cli.py --validate \
               << pipeline.parameters.build-link-a >> \
               << pipeline.parameters.build-link-b >>
   info:
@@ -48,7 +48,7 @@ jobs:
       - run:
           name: Parse build information
           command: |
-            python cli.py --index=$CIRCLE_NODE_INDEX --info \
+            poetry run python cli.py --index=$CIRCLE_NODE_INDEX --info \
               << pipeline.parameters.build-link-a >> \
               << pipeline.parameters.build-link-b >>
       - persist_to_workspace:
