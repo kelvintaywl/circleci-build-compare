@@ -65,7 +65,8 @@ jobs:
       - run:
           name: Diff
           command: |
-            git diff --no-index job_info_0.yml job_info_1.yml
+            # use --no-pager to disable interactive
+            git --no-pager diff --no-index job_info_0.yml job_info_1.yml
 
 workflows:
   diff-builds:
