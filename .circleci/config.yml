@@ -55,6 +55,9 @@ jobs:
           root: .
           paths:
             - job_info_*.yml
+      - store_artifacts:
+          path: job_info_*.yml
+          destination: job_info.yml
   visualize:
     resource_class: small
     docker:
