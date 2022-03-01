@@ -6,6 +6,8 @@ Also, this dogfoods CircleCI features whenever applicable :nerd_face:
 
 ## Pipeline
 
+![How to Trigger the Pipeline](trigger-pipeline.png)
+
 We have set up a CircleCI pipeline that runs comparisions between builds.
 Check out the _.circleci/config.yml_ for more details.
 ### Workflows
