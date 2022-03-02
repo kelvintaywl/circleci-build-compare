@@ -63,15 +63,15 @@ jobs:
     docker:
       - image: cimg/base:stable
     steps:
-      - checkout
       - attach_workspace:
           at: .
       - run:
           name: Diff
           command: |
-            # diff-so-fancy script v1.4.2
-            # See https://github.com/so-fancy/diff-so-fancy
-            diff -u job_info/0.yml job_info/1.yml | ./diff-so-fancy
+            git config --global color.ui auto
+            # use --no-pager to disable interactive
+            # git diff will exit 1 if there is a diff indeed
+            git --no-pager diff --color --no-index job_info/0.yml job_info/1.yml || true
 
 workflows:
   diff-builds:
