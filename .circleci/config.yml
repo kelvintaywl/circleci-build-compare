@@ -71,7 +71,7 @@ jobs:
             git config --global color.ui auto
             # use --no-pager to disable interactive
             # git diff will exit 1 if there is a diff indeed
-            git --no-pager diff --no-index job_info/0.yml job_info/1.yml || true
+            git --no-pager diff --color --no-index job_info/0.yml job_info/1.yml || true
 
 workflows:
   diff-builds:
