@@ -6,7 +6,7 @@ import logging
 import os
 from pathlib import Path
 import re
-from typing import List
+from typing import List, Optional
 from urllib.parse import urlparse
 
 
@@ -39,13 +39,15 @@ class BuildOutput:
 @dataclass
 class BuildAction:
     name: str
-    output_url: str  # presigned S3 URL; no authentication required
+    output_url: Optional[str]  # presigned S3 URL; no authentication required
     bash_command: str
     infrastructure_fail: bool
     status: str
 
     @cached_property
     def output(self) -> List[BuildOutput]:
+        if not self.output_url:
+            return []
         # lazily evaluated, and cached
         # so we dont need to fetch again.
         if req := requests.get(self.output_url):
@@ -102,7 +104,7 @@ def __extract_steps(data: dict) -> List[BuildStep]:
     def _extract(d: dict) -> dict:
         return {
             "name": d["name"],
-            "output_url": d["output_url"],
+            "output_url": d.get("output_url"),  # can be empty
             "status": d["status"],
             "infrastructure_fail": d["infrastructure_fail"],
             "bash_command": d["bash_command"],
