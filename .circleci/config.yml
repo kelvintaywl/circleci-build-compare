@@ -54,10 +54,10 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - job_info_*.yml
+            - job_info
       - store_artifacts:
-          path: job_info_*.yml
-          destination: job_info.yml
+          path: job_info
+
   visualize:
     resource_class: small
     docker:
@@ -71,7 +71,7 @@ jobs:
             git config --global color.ui auto
             # use --no-pager to disable interactive
             # git diff will exit 1 if there is a diff indeed
-            git --no-pager diff --no-index job_info_0.yml job_info_1.yml || true
+            git --no-pager diff --no-index job_info/0.yml job_info/1.yml || true
 
 workflows:
   diff-builds:

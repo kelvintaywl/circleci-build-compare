@@ -4,9 +4,11 @@ from functools import cached_property, lru_cache
 import json
 import logging
 import os
+from pathlib import Path
 import re
 from typing import List
 from urllib.parse import urlparse
+
 
 import requests
 import yaml
@@ -144,7 +146,10 @@ def __output_build_info(_link: BuildLink, steps: List[BuildStep], index: int):
     }
 
     # outputs to YAML
-    output_path = f"job_info_{index}.yml"
+    output_dir = "job_info"  # relative to cur dir
+    Path(output_dir).mkdir(exist_ok=True) # create if not exists
+    output_path = os.path.join(output_dir, f"{index}.yml")
+
     with open(output_path, "w") as f:
         yaml.dump(dct, f)
         logging.info(f"-> Written to {output_path}")
