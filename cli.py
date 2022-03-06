@@ -25,6 +25,8 @@ def token() -> str:
 #     └── BuildAction
 #         └── BuildOutput
 #             └── logs
+# BuildCommit
+
 @dataclass
 class BuildOutput:
     message: str
@@ -89,6 +91,13 @@ class BuildLink:
         assert self.hostname == "app.circleci.com"
 
 
+@dataclass
+class BuildCommit:
+    branch: Optional[str]
+    sha: Optional[str]
+    author: Optional[str]
+
+
 def validate(links: List[BuildLink]):
     logging.info("Validate")
     a, b, *_ = links  # only concerned with first 2 links
@@ -120,7 +129,15 @@ def __extract_steps(data: dict) -> List[BuildStep]:
     return [_build_step(step) for step in data["steps"]]
 
 
-def __output_build_info(_link: BuildLink, steps: List[BuildStep], index: int):
+def __extract_commit(data: dict) -> BuildCommit:
+    return BuildCommit(
+        branch=data.get("branch"),
+        sha=data.get("vcs_revision"),
+        author=data.get("committer_name")
+    )
+
+
+def __output_build_info(_link: BuildLink, commit: BuildCommit, steps: List[BuildStep], index: int):
     # generate a dict
     actions = [act for s in steps for act in s.actions]
 
@@ -132,12 +149,12 @@ def __output_build_info(_link: BuildLink, steps: List[BuildStep], index: int):
             "output": [log for o in act.output for log in o.logs],
         }
 
-    dct = {
-        "vcs": {
+    info = {
+        "commit": {
             "project": f"{link.vcs}/{link.project}",
-            "branch": "",
-            "commit": "",
-            "author": "",
+            "branch": commit.branch,
+            "sha": commit.sha,
+            "author": commit.author,
         },
         "build": {
             "pipeline_id": link.pipeline_id,
@@ -153,7 +170,7 @@ def __output_build_info(_link: BuildLink, steps: List[BuildStep], index: int):
     output_path = os.path.join(output_dir, f"{index}.yml")
 
     with open(output_path, "w") as f:
-        yaml.dump(dct, f)
+        yaml.dump(info, f)
         logging.info(f"-> Written to {output_path}")
 
 
@@ -165,9 +182,10 @@ def info(link: BuildLink, index: int):
     )
     response = requests.get(url, headers={"Circle-Token": token()})
     data = response.json()
+    commit = __extract_commit(data)
     steps = __extract_steps(data)
 
-    __output_build_info(link, steps, index)
+    __output_build_info(link, commit, steps, index)
 
 
 def setup_logging():
