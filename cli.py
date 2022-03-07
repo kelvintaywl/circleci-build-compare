@@ -1,3 +1,18 @@
+"""
+This script includes the operations required to compare 2 CircleCI job builds.
+
+Examples:
+
+To validate the 2 build links:
+
+    poetry run python cli.py --validate https://app.circleci.com/pipelines/github/myorg/foobar/123/workflows/{uuid}/jobs/11 https://app.circleci.com/pipelines/github/myorg/foobar/124/workflows/{uuid}/jobs/12
+
+To generate the build information for build link B (i.e., 2nd link):
+
+    poetry run python cli.py --info --index=1 https://app.circleci.com/pipelines/github/myorg/foobar/123/workflows/{uuid}/jobs/11 https://app.circleci.com/pipelines/github/myorg/foobar/124/workflows/{uuid}/jobs/12
+
+"""
+
 import argparse
 from dataclasses import dataclass, field
 from functools import cached_property, lru_cache
@@ -194,7 +209,11 @@ def setup_logging():
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Compare 2 CircleCI Cloud builds")
+    # uses the docstring above to generate description.
+    parser = argparse.ArgumentParser(
+        epilog=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
     parser.add_argument(
         "build_links",
         metavar="URL",
